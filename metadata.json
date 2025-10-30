@@ -1,0 +1,5 @@
+{
+  "name": "Fuel Consumption Tracker",
+  "description": "An application to log your vehicle's fueling history (date, liters, odometer reading) and generate reports on average fuel consumption over user-selected time periods. Includes a settings page to reset all data.",
+  "requestFramePermissions": []
+}
