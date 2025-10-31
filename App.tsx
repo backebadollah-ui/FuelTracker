@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0853ba9 (Test Commit)
 import React, { useState, useEffect, useCallback } from 'react';
 import type { FuelRecord, AppView } from './types';
 import BottomNav from './components/BottomNav';
@@ -15,7 +18,13 @@ const App: React.FC = () => {
     try {
       const storedRecords = localStorage.getItem('fuelRecords');
       if (storedRecords) {
+<<<<<<< HEAD
         setFuelRecords(JSON.parse(storedRecords));
+=======
+        const parsedRecords: FuelRecord[] = JSON.parse(storedRecords);
+        const sortedRecords = parsedRecords.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || a.odometer - b.odometer);
+        setFuelRecords(sortedRecords);
+>>>>>>> 0853ba9 (Test Commit)
       }
     } catch (error) {
       console.error("Failed to load fuel records from localStorage", error);
@@ -82,4 +91,8 @@ const App: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default App;
+=======
+export default App;
+>>>>>>> 0853ba9 (Test Commit)

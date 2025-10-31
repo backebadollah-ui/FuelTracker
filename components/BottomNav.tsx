@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0853ba9 (Test Commit)
 import React from 'react';
 import type { AppView } from '../types';
 import HomeIcon from './icons/HomeIcon';
@@ -41,4 +44,8 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeView, setActiveView }) => {
   );
 };
 
+<<<<<<< HEAD
 export default BottomNav;
+=======
+export default BottomNav;
+>>>>>>> 0853ba9 (Test Commit)

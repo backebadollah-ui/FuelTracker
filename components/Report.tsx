@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0853ba9 (Test Commit)
 import React, { useState, useMemo } from 'react';
 import type { FuelRecord } from '../types';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -94,7 +97,14 @@ const Report: React.FC<ReportProps> = ({ records }) => {
               <LineChart data={chartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#4A5568" />
                 <XAxis dataKey="name" stroke="#A0AEC0" />
+<<<<<<< HEAD
                 <YAxis stroke="#A0AEC0" domain={['dataMin - 1', 'dataMax + 1']}/>
+=======
+                <YAxis
+                  stroke="#A0AEC0"
+                  domain={[dataMin => Math.max(0, Math.floor(dataMin - 1)), dataMax => Math.ceil(dataMax + 1)]}
+                />
+>>>>>>> 0853ba9 (Test Commit)
                 <Tooltip contentStyle={{ backgroundColor: '#1A202C', border: '1px solid #4A5568' }} />
                 <Legend />
                 <Line type="monotone" dataKey="L/100km" stroke="#2DD4BF" strokeWidth={2} activeDot={{ r: 8 }} />
@@ -112,4 +122,8 @@ const Report: React.FC<ReportProps> = ({ records }) => {
   );
 };
 
+<<<<<<< HEAD
 export default Report;
+=======
+export default Report;
+>>>>>>> 0853ba9 (Test Commit)
