@@ -1,3 +1,4 @@
+
 import React from 'react';
 import type { AppView } from '../types';
 import HomeIcon from './icons/HomeIcon';

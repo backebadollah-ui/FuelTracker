@@ -36,6 +36,14 @@ const App: React.FC = () => {
     setActiveView('history');
   }, [fuelRecords]);
 
+  const updateRecord = useCallback((updatedRecord: FuelRecord) => {
+    setFuelRecords(prevRecords => {
+      const updatedRecords = prevRecords.map(r => r.id === updatedRecord.id ? updatedRecord : r);
+      // Re-sort the array to maintain data integrity
+      return updatedRecords.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || a.odometer - b.odometer);
+    });
+  }, []);
+
   const deleteRecord = useCallback((id: string) => {
     if (window.confirm('Are you sure you want to delete this entry?')) {
       setFuelRecords(prevRecords => prevRecords.filter(record => record.id !== id));
@@ -49,16 +57,23 @@ const App: React.FC = () => {
     }
   }, []);
 
+  const importData = useCallback((records: FuelRecord[]) => {
+    const sortedRecords = [...records].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime() || a.odometer - b.odometer);
+    setFuelRecords(sortedRecords);
+    alert("Data imported successfully!");
+    setActiveView('history');
+  }, []);
+
   const renderContent = () => {
     switch (activeView) {
       case 'home':
         return <FuelForm addRecord={addRecord} lastOdometer={fuelRecords.length > 0 ? fuelRecords[fuelRecords.length - 1].odometer : 0} />;
       case 'history':
-        return <HistoryList records={fuelRecords} deleteRecord={deleteRecord} />;
+        return <HistoryList records={fuelRecords} deleteRecord={deleteRecord} updateRecord={updateRecord} />;
       case 'reports':
         return <Report records={fuelRecords} />;
       case 'settings':
-        return <Settings resetData={resetData} />;
+        return <Settings resetData={resetData} records={fuelRecords} importData={importData} />;
       default:
         return <FuelForm addRecord={addRecord} lastOdometer={fuelRecords.length > 0 ? fuelRecords[fuelRecords.length - 1].odometer : 0} />;
     }
