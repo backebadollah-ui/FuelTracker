@@ -14,7 +14,12 @@ const App: React.FC = () => {
     try {
       const storedRecords = localStorage.getItem('fuelRecords');
       if (storedRecords) {
-        setFuelRecords(JSON.parse(storedRecords));
+        // Add backward compatibility for old records
+        const parsedRecords: FuelRecord[] = JSON.parse(storedRecords).map((r: any) => ({
+          ...r,
+          price: r.price ?? 0, // Default price to 0 if not present
+        }));
+        setFuelRecords(parsedRecords);
       }
     } catch (error) {
       console.error("Failed to load fuel records from localStorage", error);

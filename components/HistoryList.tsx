@@ -9,9 +9,10 @@ interface HistoryListProps {
 }
 
 // FIX: Define a type for the record being edited, to hold form values as strings.
-type EditableFuelRecord = Omit<FuelRecord, 'liters' | 'odometer'> & {
+type EditableFuelRecord = Omit<FuelRecord, 'liters' | 'odometer' | 'price'> & {
     liters: string;
     odometer: string;
+    price: string;
 };
 
 const HistoryList: React.FC<HistoryListProps> = ({ records, deleteRecord, updateRecord }) => {
@@ -38,7 +39,8 @@ const HistoryList: React.FC<HistoryListProps> = ({ records, deleteRecord, update
     setEditedRecord({ 
         ...record, 
         liters: record.liters.toString(), 
-        odometer: record.odometer.toString() 
+        odometer: record.odometer.toString(),
+        price: record.price.toString(),
     });
     setError('');
   };
@@ -55,14 +57,15 @@ const HistoryList: React.FC<HistoryListProps> = ({ records, deleteRecord, update
     // FIX: Parse from string values, no longer need to cast since the state type is correct.
     const litersNum = parseFloat(editedRecord.liters);
     const odometerNum = parseInt(editedRecord.odometer, 10);
+    const priceNum = parseInt(editedRecord.price, 10);
 
-    if (!editedRecord.date || !editedRecord.liters || !editedRecord.odometer) {
+    if (!editedRecord.date || !editedRecord.liters || !editedRecord.odometer || !editedRecord.price) {
       setError('All fields are required.');
       return;
     }
     
-    if (isNaN(litersNum) || isNaN(odometerNum) || litersNum <= 0 || odometerNum <= 0) {
-      setError('Liters and odometer must be positive numbers.');
+    if (isNaN(litersNum) || isNaN(odometerNum) || isNaN(priceNum) || litersNum <= 0 || odometerNum <= 0 || priceNum <= 0) {
+      setError('Liters, odometer, and price must be positive numbers.');
       return;
     }
     
@@ -87,6 +90,7 @@ const HistoryList: React.FC<HistoryListProps> = ({ records, deleteRecord, update
         date: editedRecord.date,
         liters: litersNum,
         odometer: odometerNum,
+        price: priceNum,
     });
     handleCancel(); // Reset state after saving
   };
@@ -104,7 +108,7 @@ const HistoryList: React.FC<HistoryListProps> = ({ records, deleteRecord, update
         <div key={record.id} className="bg-gray-800 p-4 rounded-lg shadow-lg transition-transform transform hover:scale-102 duration-300">
           {editingRecordId === record.id ? (
             <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-start">
                     <div>
                         <label className="block text-xs font-medium text-gray-400 mb-1">Date</label>
                         <input type="date" name="date" value={editedRecord?.date || ''} onChange={handleInputChange} className="w-full bg-gray-700 text-white p-2 rounded-md border border-gray-600 focus:ring-2 focus:ring-cyan-500"/>
@@ -112,6 +116,10 @@ const HistoryList: React.FC<HistoryListProps> = ({ records, deleteRecord, update
                      <div>
                         <label className="block text-xs font-medium text-gray-400 mb-1">Liters</label>
                         <input type="number" name="liters" value={editedRecord?.liters || ''} onChange={handleInputChange} step="0.01" min="0" className="w-full bg-gray-700 text-white p-2 rounded-md border border-gray-600 focus:ring-2 focus:ring-cyan-500"/>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">Price (Toman)</label>
+                        <input type="number" name="price" value={editedRecord?.price || ''} onChange={handleInputChange} min="0" className="w-full bg-gray-700 text-white p-2 rounded-md border border-gray-600 focus:ring-2 focus:ring-cyan-500"/>
                     </div>
                      <div>
                         <label className="block text-xs font-medium text-gray-400 mb-1">Odometer (km)</label>
@@ -129,6 +137,7 @@ const HistoryList: React.FC<HistoryListProps> = ({ records, deleteRecord, update
               <div>
                 <p className="font-semibold text-lg text-cyan-300">{new Date(record.date).toLocaleDateString('en-CA')}</p>
                 <p className="text-gray-300"><span className="font-medium">Liters:</span> {record.liters.toFixed(2)} L</p>
+                <p className="text-gray-300"><span className="font-medium">Price:</span> {(record.price || 0).toLocaleString()} Toman</p>
                 <p className="text-gray-300"><span className="font-medium">Odometer:</span> {record.odometer.toLocaleString()} km</p>
               </div>
               <div className="flex items-center gap-2">

@@ -46,7 +46,8 @@ const Settings: React.FC<SettingsProps> = ({ resetData, records, importData }) =
         typeof record.id === 'string' &&
         typeof record.date === 'string' && !isNaN(new Date(record.date).getTime()) &&
         typeof record.liters === 'number' &&
-        typeof record.odometer === 'number'
+        typeof record.odometer === 'number' &&
+        typeof record.price === 'number'
     );
   };
 

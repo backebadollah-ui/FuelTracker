@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import type { FuelRecord } from '../types';
 
@@ -10,6 +9,7 @@ interface FuelFormProps {
 const FuelForm: React.FC<FuelFormProps> = ({ addRecord, lastOdometer }) => {
   const [date, setDate] = useState('');
   const [liters, setLiters] = useState('');
+  const [price, setPrice] = useState('');
   const [odometer, setOdometer] = useState('');
   const [error, setError] = useState('');
 
@@ -26,14 +26,15 @@ const FuelForm: React.FC<FuelFormProps> = ({ addRecord, lastOdometer }) => {
 
     const litersNum = parseFloat(liters);
     const odometerNum = parseInt(odometer, 10);
+    const priceNum = parseInt(price, 10);
 
-    if (!date || !liters || !odometer) {
+    if (!date || !liters || !odometer || !price) {
       setError('All fields are required.');
       return;
     }
 
-    if (isNaN(litersNum) || isNaN(odometerNum) || litersNum <= 0 || odometerNum <= 0) {
-      setError('Liters and odometer must be positive numbers.');
+    if (isNaN(litersNum) || isNaN(odometerNum) || isNaN(priceNum) || litersNum <= 0 || odometerNum <= 0 || priceNum <= 0) {
+      setError('Liters, odometer, and price must be positive numbers.');
       return;
     }
 
@@ -46,10 +47,12 @@ const FuelForm: React.FC<FuelFormProps> = ({ addRecord, lastOdometer }) => {
       date,
       liters: litersNum,
       odometer: odometerNum,
+      price: priceNum,
     });
 
     setLiters('');
     setOdometer('');
+    setPrice('');
     setError('');
   };
 
@@ -76,6 +79,18 @@ const FuelForm: React.FC<FuelFormProps> = ({ addRecord, lastOdometer }) => {
             onChange={(e) => setLiters(e.target.value)}
             placeholder="e.g., 45.5"
             step="0.01"
+            min="0"
+            className="w-full bg-gray-700 text-white p-3 rounded-md border border-gray-600 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
+          />
+        </div>
+        <div>
+          <label htmlFor="price" className="block text-sm font-medium text-gray-300 mb-2">Total Price (Toman)</label>
+          <input
+            type="number"
+            id="price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            placeholder="e.g., 250000"
             min="0"
             className="w-full bg-gray-700 text-white p-3 rounded-md border border-gray-600 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 transition"
           />

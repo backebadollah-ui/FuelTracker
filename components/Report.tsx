@@ -30,6 +30,7 @@ const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
                 <p className="text-white">{`Consumption: ${data['L/100km']} L/100km`}</p>
                 <p className="text-gray-300">{`Distance: ${data.distance.toLocaleString()} km`}</p>
                 <p className="text-gray-300">{`Fuel: ${data.liters.toFixed(2)} L`}</p>
+                <p className="text-gray-300">{`Cost: ${(data.price || 0).toLocaleString()} Toman`}</p>
             </div>
         );
     }
@@ -73,19 +74,20 @@ const Report: React.FC<ReportProps> = ({ records }) => {
 
   const isDateRangeValid = useMemo(() => new Date(startDate) <= new Date(endDate), [startDate, endDate]);
 
-  const { reportData, chartData, totalDistance, totalLiters, overallConsumption } = useMemo(() => {
+  const { reportData, chartData, totalDistance, totalLiters, overallConsumption, totalCost, avgPricePerLiter, avgCostPerKm } = useMemo(() => {
+    const emptyReport = { reportData: [], chartData: [], totalDistance: 0, totalLiters: 0, overallConsumption: 0, totalCost: 0, avgPricePerLiter: 0, avgCostPerKm: 0 };
     if (!isDateRangeValid) {
-        return { reportData: [], chartData: [], totalDistance: 0, totalLiters: 0, overallConsumption: 0 };
+        return emptyReport;
     }
     const filteredRecords = records
       .filter(r => r.date >= startDate && r.date <= endDate)
       .sort((a, b) => a.odometer - b.odometer);
 
     if (filteredRecords.length < 2) {
-      return { reportData: [], chartData: [], totalDistance: 0, totalLiters: 0, overallConsumption: 0 };
+      return emptyReport;
     }
     
-    const reportItems: { distance: number; liters: number; consumption: number; date: string }[] = [];
+    const reportItems: { distance: number; liters: number; consumption: number; date: string; price: number; }[] = [];
     
     for (let i = 1; i < filteredRecords.length; i++) {
         const prev = filteredRecords[i-1];
@@ -93,6 +95,7 @@ const Report: React.FC<ReportProps> = ({ records }) => {
         
         const distance = curr.odometer - prev.odometer;
         const liters = curr.liters;
+        const price = curr.price || 0; // handle potentially missing price on old records
         
         if (distance > 0) {
             const consumption = (liters / distance) * 100;
@@ -100,23 +103,28 @@ const Report: React.FC<ReportProps> = ({ records }) => {
                 distance,
                 liters,
                 consumption,
-                date: curr.date
+                date: curr.date,
+                price
             });
         }
     }
     
     const totalDistance = filteredRecords[filteredRecords.length - 1].odometer - filteredRecords[0].odometer;
     const totalLiters = reportItems.reduce((sum, item) => sum + item.liters, 0);
+    const totalCost = reportItems.reduce((sum, item) => sum + item.price, 0);
     const overallConsumption = totalDistance > 0 ? (totalLiters / totalDistance) * 100 : 0;
+    const avgPricePerLiter = totalLiters > 0 ? totalCost / totalLiters : 0;
+    const avgCostPerKm = totalDistance > 0 ? totalCost / totalDistance : 0;
     
     const chartData = reportItems.map(item => ({
         name: new Date(item.date).toLocaleDateString('en-CA', { month: 'short', day: 'numeric' }),
         'L/100km': parseFloat(item.consumption.toFixed(2)),
         distance: item.distance,
         liters: item.liters,
+        price: item.price,
     }));
 
-    return { reportData: reportItems, chartData, totalDistance, totalLiters, overallConsumption };
+    return { reportData: reportItems, chartData, totalDistance, totalLiters, overallConsumption, totalCost, avgPricePerLiter, avgCostPerKm };
   }, [records, startDate, endDate, isDateRangeValid]);
 
   if (records.length < 2) {
@@ -192,11 +200,24 @@ const Report: React.FC<ReportProps> = ({ records }) => {
         </div>
       ) : reportData.length > 0 ? (
         <>
-          <div className="bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-            <h3 className="text-xl font-bold text-cyan-400 mb-2">Overall Average</h3>
-            <p className="text-4xl font-light">{overallConsumption.toFixed(2)} <span className="text-2xl text-gray-400">L/100km</span></p>
-            <p className="text-gray-400 mt-2">({totalLiters.toFixed(2)} L / {totalDistance.toLocaleString()} km)</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                  <h3 className="text-lg font-bold text-cyan-400 mb-2">Avg. Consumption</h3>
+                  <p className="text-3xl font-light">{overallConsumption.toFixed(2)}</p>
+                  <p className="text-sm text-gray-400">L/100km</p>
+              </div>
+              <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                  <h3 className="text-lg font-bold text-cyan-400 mb-2">Total Cost</h3>
+                  <p className="text-3xl font-light">{totalCost.toLocaleString()}</p>
+                  <p className="text-sm text-gray-400">Toman</p>
+              </div>
+              <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                  <h3 className="text-lg font-bold text-cyan-400 mb-2">Cost Breakdown</h3>
+                  <p className="text-xl font-light">{avgPricePerLiter.toFixed(0)} <span className="text-sm text-gray-400">Toman/L</span></p>
+                  <p className="text-xl font-light mt-1">{avgCostPerKm.toFixed(0)} <span className="text-sm text-gray-400">Toman/km</span></p>
+              </div>
           </div>
+
 
           <div className="bg-gray-800 p-4 rounded-lg shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-center">Consumption Trend</h3>
@@ -221,6 +242,7 @@ const Report: React.FC<ReportProps> = ({ records }) => {
                     <th scope="col" className="px-6 py-3">Date</th>
                     <th scope="col" className="px-6 py-3 text-right">Distance (km)</th>
                     <th scope="col" className="px-6 py-3 text-right">Liters</th>
+                    <th scope="col" className="px-6 py-3 text-right">Price (Toman)</th>
                     <th scope="col" className="px-6 py-3 text-right">L/100km</th>
                   </tr>
                 </thead>
@@ -230,6 +252,7 @@ const Report: React.FC<ReportProps> = ({ records }) => {
                       <td className="px-6 py-4 font-medium whitespace-nowrap">{item.date}</td>
                       <td className="px-6 py-4 text-right">{item.distance.toLocaleString()}</td>
                       <td className="px-6 py-4 text-right">{item.liters.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-right">{item.price.toLocaleString()}</td>
                       <td className="px-6 py-4 text-right font-bold">{item.consumption.toFixed(2)}</td>
                     </tr>
                   ))}
