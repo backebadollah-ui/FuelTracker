@@ -200,7 +200,17 @@ const Report: React.FC<ReportProps> = ({ records }) => {
         </div>
       ) : reportData.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                  <h3 className="text-lg font-bold text-cyan-400 mb-2">Total Distance</h3>
+                  <p className="text-3xl font-light">{totalDistance.toLocaleString()}</p>
+                  <p className="text-sm text-gray-400">km</p>
+              </div>
+              <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                  <h3 className="text-lg font-bold text-cyan-400 mb-2">Total Fuel</h3>
+                  <p className="text-3xl font-light">{totalLiters.toFixed(2)}</p>
+                  <p className="text-sm text-gray-400">Liters</p>
+              </div>
               <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
                   <h3 className="text-lg font-bold text-cyan-400 mb-2">Avg. Consumption</h3>
                   <p className="text-3xl font-light">{overallConsumption.toFixed(2)}</p>
@@ -211,7 +221,7 @@ const Report: React.FC<ReportProps> = ({ records }) => {
                   <p className="text-3xl font-light">{totalCost.toLocaleString()}</p>
                   <p className="text-sm text-gray-400">Toman</p>
               </div>
-              <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+              <div className="bg-gray-800 p-4 rounded-lg shadow-xl text-center sm:col-span-2 md:col-span-1">
                   <h3 className="text-lg font-bold text-cyan-400 mb-2">Cost Breakdown</h3>
                   <p className="text-xl font-light">{avgPricePerLiter.toFixed(0)} <span className="text-sm text-gray-400">Toman/L</span></p>
                   <p className="text-xl font-light mt-1">{avgCostPerKm.toFixed(0)} <span className="text-sm text-gray-400">Toman/km</span></p>
